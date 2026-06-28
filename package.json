@@ -1,0 +1,9 @@
+{
+  "name": "telegram-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Transparent proxy to the Telegram Bot API, for servers behind censorship (Iran VPS). Deploy on Netlify or Cloudflare Workers.",
+  "engines": {
+    "node": ">=18"
+  }
+}

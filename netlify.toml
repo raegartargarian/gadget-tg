@@ -1,0 +1,18 @@
+# Netlify config for the Telegram Bot API proxy.
+#
+# All traffic under /tg/* is rewritten to the proxy function. So the public
+# base URL the backend should use is:  https://<your-site>.netlify.app/tg
+# e.g. the backend then calls  https://<your-site>.netlify.app/tg/bot<TOKEN>/sendPhoto
+
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/tg/*"
+  to = "/.netlify/functions/proxy/:splat"
+  status = 200
+  force = true
