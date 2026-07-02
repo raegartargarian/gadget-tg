@@ -93,7 +93,8 @@ Deno.serve(async (request: Request): Promise<Response> => {
 
       const init: RequestInit = { method: request.method, headers };
       if (request.method !== "GET" && request.method !== "HEAD") {
-        init.body = await request.text();
+        // Forward the raw bytes — `.text()` would corrupt binary/multipart bodies.
+        init.body = await request.arrayBuffer();
       }
 
       try {
@@ -122,10 +123,15 @@ Deno.serve(async (request: Request): Promise<Response> => {
   const target = `${TELEGRAM_ORIGIN}${url.pathname.slice(idx)}${url.search}`;
   const init: RequestInit = {
     method: request.method,
+    // Preserve the incoming content-type verbatim so a multipart boundary (used
+    // by photo uploads) survives — defaulting to JSON only when none is sent.
     headers: { "content-type": request.headers.get("content-type") || "application/json" },
   };
   if (request.method !== "GET" && request.method !== "HEAD") {
-    init.body = await request.text();
+    // Forward the raw bytes. Image uploads (sendPhoto/sendMediaGroup) send
+    // multipart/form-data with binary parts; `.text()` mangles them and breaks
+    // the boundary, so we must pass the body through untouched.
+    init.body = await request.arrayBuffer();
   }
 
   try {

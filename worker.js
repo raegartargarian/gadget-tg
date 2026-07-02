@@ -32,7 +32,8 @@ export default {
       headers: { 'content-type': request.headers.get('content-type') || 'application/json' },
     };
     if (request.method !== 'GET' && request.method !== 'HEAD') {
-      init.body = await request.text();
+      // Forward raw bytes — `.text()` corrupts binary/multipart photo uploads.
+      init.body = await request.arrayBuffer();
     }
 
     try {
